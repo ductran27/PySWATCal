@@ -167,7 +167,8 @@ MIT License - see [LICENSE](LICENSE) file for details
 If you use PySWATCal in your research, please cite:
 
 ```
-[To be added upon publication]
+Tran, T.N.D. (2025). PySWATCal: Python SWAT Calibration & Analysis Tool. 
+https://github.com/ductran27/PySWATCal
 ```
 
 ## Contributing
