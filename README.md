@@ -121,15 +121,6 @@ python examples/demo_test.py
 
 This runs comprehensive validation using the included demo SWAT watershed.
 
-## Documentation
-
-Complete documentation available:
-- `README.md` (this file) - Setup and usage instructions
-- `STATUS.md` - Current feature roadmap
-- `DEMO_DATA.md` - Demo watershed attribution
-- `FINAL_PROJECT_SUMMARY.md` - Complete project documentation
-- `examples/` - Sample data and usage demonstrations
-
 ## Project Structure
 
 ```
