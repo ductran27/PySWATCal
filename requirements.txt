@@ -1,0 +1,53 @@
+# PySWATCal Dependencies
+
+# Core Scientific Computing
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+
+# Optimization and Calibration
+scikit-optimize>=0.9.0
+pyswarm>=0.6  # Particle Swarm Optimization
+
+# Sensitivity Analysis
+SALib>=1.4.7
+
+# Parallel Processing
+joblib>=1.3.0
+
+# Data Validation
+pydantic>=2.0.0
+
+# File Handling
+PyYAML>=6.0
+tables>=3.8.0  # HDF5 support
+pyarrow>=12.0.0  # Parquet support
+
+# Visualization
+plotly>=5.14.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Web Interface (Streamlit)
+streamlit>=1.28.0
+streamlit-extras>=0.3.0
+
+# Progress Tracking
+tqdm>=4.65.0
+
+# Date/Time Handling
+python-dateutil>=2.8.2
+
+# Testing
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-mock>=3.11.0
+
+# Code Quality
+black>=23.7.0
+flake8>=6.1.0
+mypy>=1.5.0
+
+# Documentation
+mkdocs>=1.5.0
+mkdocs-material>=9.2.0

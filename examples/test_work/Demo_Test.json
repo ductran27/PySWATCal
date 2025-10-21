@@ -1,0 +1,38 @@
+{
+  "name": "Demo_Test",
+  "description": "",
+  "created": "2025-10-21T14:29:31.338652",
+  "modified": "2025-10-21T14:29:31.338740",
+  "version": "0.1.0",
+  "model_type": "SWAT",
+  "working_dir": "/Users/ductran/Desktop/projects/PySWATCal/examples/test_work",
+  "txtinout_dir": "/Users/ductran/Desktop/projects/PySWATCal/examples/swat_demo/swat2012_rev622_demo",
+  "swat_executable": null,
+  "parameters": [
+    {
+      "name": "CN2",
+      "file_type": ".mgt",
+      "min_value": -0.2,
+      "max_value": 0.2,
+      "change_type": "relative",
+      "description": ""
+    },
+    {
+      "name": "ALPHA_BF",
+      "file_type": ".gw",
+      "min_value": 0.0,
+      "max_value": 1.0,
+      "change_type": "replace",
+      "description": ""
+    }
+  ],
+  "start_date": null,
+  "end_date": null,
+  "warmup_years": 0,
+  "calibration_method": "DDS",
+  "n_iterations": 100,
+  "n_workers": 4,
+  "output_variables": [],
+  "status": "created",
+  "results": null
+}
