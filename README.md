@@ -40,6 +40,95 @@ streamlit run app.py
 > This project ships with `.streamlit/config.toml` setting `browser.gatherUsageStats = false`
 > so future runs skip the prompt automatically.
 
+## Step-by-Step Calibration Guide
+
+### Quick Start: Run Your First Calibration
+
+Follow these steps to calibrate your SWAT model:
+
+#### Step 1: Prepare Your Data
+
+You need:
+1. **SWAT Model Directory** - TxtInOut folder with your SWAT model files
+2. **SWAT Executable** - Platform-appropriate SWAT executable
+   - Windows: `.exe` file
+   - Linux/macOS: Linux executable + Docker Desktop installed
+3. **Observed Data** - Text file with observed streamflow (or other variable)
+
+#### Step 2: Start the Application
+
+```bash
+# Activate your virtual environment
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+
+# Launch the web interface
+streamlit run app.py
+```
+
+The app will open in your browser at `http://localhost:8501`
+
+#### Step 3: Create a Project (Project Setup Page)
+
+1. Click **"Project Setup"** in the sidebar
+2. Fill in project details:
+   - **Project Name**: e.g., "MyBasin_Calibration"
+   - **Working Directory**: Where results will be saved
+   - **TxtInOut Directory**: Path to your SWAT TxtInOut folder
+   - **Model Type**: Select "SWAT" or "SWAT+"
+   - **SWAT Executable**: Path to your SWAT executable
+3. Click **"Create Project"**
+
+#### Step 4: Add Calibration Parameters (Parameters Page)
+
+1. Click **"Parameters"** in the sidebar
+2. For each parameter to calibrate:
+   - **Parameter Name**: e.g., "CN2", "ALPHA_BF"
+   - **File Extension**: e.g., ".mgt", ".gw"
+   - **Min/Max Values**: Set calibration bounds
+   - **Change Type**: "relative", "replace", or "absolute"
+3. Click **"Add Parameter"**
+4. Repeat for all parameters (typically 5-20 parameters)
+
+**Recommended parameters for streamflow calibration:**
+- CN2 (.mgt): -0.25 to 0.25 (relative)
+- ALPHA_BF (.gw): 0.01 to 1.0 (replace)
+- GW_DELAY (.gw): 0 to 500 (replace)
+- ESCO (.hru): 0.0 to 1.0 (replace)
+- CH_N2 (.rte): 0.0 to 0.3 (replace)
+
+#### Step 5: Run Calibration (Run Calibration Page)
+
+1. Click **"Run Calibration"** in the sidebar
+2. Configure calibration settings:
+   - **Algorithm**: Choose DDS, GLUE, or PSO
+   - **Iterations**: 100-500 (more = better but slower)
+   - **Objective Function**: NSE, KGE, or custom
+   - **Observed Data File**: Upload or select your observations
+3. Click **"Start Calibration"**
+4. Monitor progress in real-time
+
+#### Step 6: View Results (Results Page)
+
+1. Click **"Results"** in the sidebar
+2. View performance metrics:
+   - NSE, KGE, RMSE, PBIAS values
+   - Parameter convergence plots
+   - Observed vs. Simulated hydrographs
+   - Flow duration curves
+3. Download results and calibrated parameters
+
+### Command-Line Calibration (Advanced)
+
+For automated workflows or batch processing:
+
+```bash
+# Run calibration via Python script
+python examples/demo_test.py
+
+# Or create your own script (see Usage section below)
+python my_calibration_script.py
+```
+
 ## Usage
 
 ### Option 1: Python API (Programmatic Usage)
@@ -137,10 +226,105 @@ PySWATCal/
 └── app.py              # Main Streamlit application
 ```
 
+## Cross-Platform Support
+
+### Running SWAT on macOS and Linux
+
+SWAT executables are platform-specific, with most distributions providing only Windows binaries. PySWATCal addresses this limitation through Docker integration, enabling SWAT execution on macOS and Linux without requiring virtual machines.
+
+### Platform Compatibility
+
+SWAT model executables come in different formats:
+- **Windows**: `.exe` files (most commonly distributed)
+- **Linux**: ELF binaries (available from SWAT developers)
+- **macOS**: Native binaries are rarely available
+
+Traditionally, macOS and Linux users needed virtual machines or dual-boot configurations to run SWAT models.
+
+### Docker Integration
+
+PySWATCal includes Docker support that works automatically based on your system configuration:
+
+**Automatic detection**: The `SWATRunner` class detects your platform and executable type, then selects the appropriate execution method.
+
+**Platform behavior:**
+- **Windows**: Runs `.exe` files natively without Docker
+- **Linux**: Runs Linux binaries natively without Docker
+- **macOS**: Automatically uses Docker to run Linux binaries in a container
+- **Any platform with incompatible executable**: Falls back to Docker automatically
+
+This approach requires no manual configuration - users simply provide their SWAT executable, and PySWATCal handles the rest.
+
+### Setting Up Docker for SWAT
+
+#### Prerequisites
+
+1. **Install Docker Desktop**
+   - Download from: https://www.docker.com/products/docker-desktop/
+   - Available for macOS, Windows, and Linux
+   - Free for personal use
+
+2. **Obtain Linux SWAT Executable**
+   - Request from SWAT development team
+   - Or compile from source for Linux
+
+#### Docker Configuration
+
+PySWATCal includes a `Dockerfile.swat` that sets up the Ubuntu environment with required Fortran libraries:
+
+```dockerfile
+FROM ubuntu:20.04
+RUN apt-get update && apt-get install -y libgfortran5
+WORKDIR /swat
+CMD ["./swat_executable"]
+```
+
+The `SWATRunner` class automatically:
+- Builds the Docker image when needed
+- Mounts your SWAT model files as volumes
+- Executes SWAT in the container
+- Retrieves results back to your host system
+
+#### Usage Example with Docker
+
+```python
+from pyswatcal.core import FileManager, SWATRunner
+from pathlib import Path
+
+# Point to your Linux SWAT executable
+swat_linux_exe = Path("./swat_linux_executable")
+
+# Initialize with Docker support (automatic on macOS/Linux)
+fm = FileManager(txtinout_dir, working_dir)
+runner = SWATRunner(swat_linux_exe, fm)
+
+# Run simulation - Docker handles everything automatically
+result = runner.run_simulation(run_id=1, parameters=params)
+
+# Results are in your working directory as usual
+```
+
+### Benefits of Docker Approach
+
+**Cross-platform**: Same code runs on macOS, Linux, and Windows  
+**No VM overhead**: Lightweight compared to traditional virtual machines  
+**Reproducible**: Consistent environment across all systems  
+**Integrated**: Works seamlessly with PySWATCal's workflow  
+**Fast**: Near-native performance  
+
+### Validated Configuration
+
+This approach has been successfully tested with:
+- **Host OS**: macOS (Apple Silicon and Intel)
+- **SWAT Version**: rev688 Linux executable
+- **Basin**: USGS basin 05459500 (Iowa River at Wapello, IA)
+- **Performance**: Real calibration metrics obtained (NSE, KGE, RMSE, PBIAS)
+
 ## Requirements
 
 - Python 3.10+
-- SWAT or SWAT+ executable
+- SWAT or SWAT+ executable (Windows, Linux, or via Docker)
+- **Docker Desktop** (required for macOS/Linux users with Linux SWAT executables)
 - 4GB+ RAM recommended for parallel processing
 
 ## License
@@ -174,5 +358,5 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 
 ---
 
-**Version**: 0.1.0-alpha  
-**Status**: Under Active Development
+**Version**: 0.2.0  
+**Status**: Stable - Docker Integration & Cross-Platform Support

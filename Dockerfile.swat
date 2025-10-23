@@ -1,0 +1,17 @@
+# Dockerfile for running SWAT on macOS via Docker
+FROM ubuntu:20.04
+
+# Install required libraries for SWAT (Fortran runtime)
+RUN apt-get update && \
+    apt-get install -y libgfortran5 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /swat
+
+# Copy will be done at runtime via volume mount
+# The SWAT executable and TxtInOut files will be mounted
+
+# Run SWAT executable
+CMD ["./swat_executable"]
